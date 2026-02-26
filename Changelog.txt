@@ -1,0 +1,22 @@
+3.01 - 25.09.04
+1) 还原
+["dataSkills"][*integer* skillTypeIndex][*integer* skillLineIndex]["skills"]下
+该类目中所有技能信息中重新加入["cost"] = *integer* resourceCost
+
+2) 逻辑修正
+["dataItems"]["Sets"][*integer* setId]下
+["place"] = {*string* zoneName, #*string* parentZoneName, #*string* parentParentZoneName}
+战场装备现在可以正常输出为 {"战场"}
+古物的地区获取方式现在为：
+  若所有线索在同一区域挖掘，输出该区域及其父区域
+  若有不同，尝试将古物所处的分类名转换为区域名，输出该区域及其父区域
+
+3) 新增
+["dataItems"]["Sets"][*integer* setId]下
+#["leads"] = {
+  [*integer* leadIndex] = {*string* leadName, *string* digZoneName},
+  ...
+}
+
+3.00
+遍历并整理代码
