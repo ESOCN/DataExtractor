@@ -9,9 +9,12 @@ local function SaveData()
     DataExtractor.savedVariables.dataItems.Furniture = DataExtractor.dataFurniture
     DataExtractor.savedVariables.dataItems.CollectibleFurniture = DataExtractor.dataCollectibleFurniture
     DataExtractor.savedVariables.dataItems.Recipes = DataExtractor.dataRecipes
+    DataExtractor.savedVariables.dataCollectibles = DataExtractor.dataCollectibles
+    DataExtractor.savedVariables.dataHouses = DataExtractor.dataHouses
     
     DataExtractor.savedVariables.dataStyles = DataExtractor.dataStyles
     DataExtractor.savedVariables.dataOutfitStyles = DataExtractor.dataOutfitStyles
+    DataExtractor.savedVariables.dataDyes = DataExtractor.dataDyes
     DataExtractor.savedVariables.dataAchievs = DataExtractor.dataAchievs
     DataExtractor.savedVariables.dataRaids = DataExtractor.dataRaids
 
@@ -56,6 +59,9 @@ function DataExtractor.LoadSettings()
           DataExtractor.GetAllOutfitStyles()
           DataExtractor.GetAllRaids()
           DataExtractor.GetAllItems()
+          DataExtractor.GetAllCollectibles()
+          DataExtractor.GetAllHouses()
+          DataExtractor.GetAllDyes()
         end,
         disabled = CraftedSkillCheck,
         width = "full",
@@ -83,6 +89,20 @@ function DataExtractor.LoadSettings()
       },
       {
         type = "button",
+        name = "收藏品",
+        tooltip = "提取所有收藏品（坐骑、宠物、家具收藏品等）",
+        func = function() DataExtractor.GetAllCollectibles() end,
+        width = "half",
+      },
+      {
+        type = "button",
+        name = "住房",
+        tooltip = "提取所有玩家住房数据",
+        func = function() DataExtractor.GetAllHouses() end,
+        width = "half",
+      },
+      {
+        type = "button",
         name = "药水",
         func = function() DataExtractor.GetAllPotions() end,
         tooltip = "需要解锁所有炼金材料的4个词条，且当前每种炼金材料持有至少1个，才可以获得所有的药水配方",
@@ -98,6 +118,13 @@ function DataExtractor.LoadSettings()
         type = "button",
         name = "样式",
         func = function() DataExtractor.GetAllStyles() end,
+        width = "half",
+      },
+      {
+        type = "button",
+        name = "染料",
+        tooltip = "提取所有染料数据（名称、颜色、稀有度、色调分类等）",
+        func = function() DataExtractor.GetAllDyes() end,
         width = "half",
       },
       {

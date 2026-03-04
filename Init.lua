@@ -225,6 +225,49 @@
 }
 ]]
 
+--[[ 住房
+["dataHouses"] = {
+  [*integer* houseId] = {
+    ["id"]              = *integer* houseId,
+    ["collectibleId"]   = *integer* collectibleId,
+    ["name"]            = *string*  houseName,
+    ["description"]     = *string*  description,
+    ["hint"]            = *string*  hintText,         -- 获取途径。
+    ["icon"]            = *string*  iconPath,
+    ["categoryType"]    = *integer* HouseCategoryType, -- 1=Staple 2=Classic 3=Notable
+    ["categoryTypeName"]= *string*  categoryTypeName,
+    ["zoneId"]          = *integer* foundInZoneId,    -- 现实世界区域ID（如 奥里顿）。
+    ["zone"]            = *string*  foundInZoneName,
+    ["houseZoneId"]     = *integer* houseZoneId,      -- 房屋内部的 zone ID。
+    ["furnishingLimits"]= {
+      ["itemLow"]         = *integer* limit,
+      ["itemHigh"]        = *integer* limit,
+      ["collectibleLow"]  = *integer* limit,
+      ["collectibleHigh"] = *integer* limit,
+    },
+    ["unlocked"]        = *bool*    playerOwnsHouse,
+  },
+  ...
+}
+]]
+
+--[[ 收藏品
+["dataCollectibles"] = {
+  [*integer* collectibleId] = {
+    ["id"]          = *integer* collectibleId,
+    ["name"]        = *string*  collectibleName,
+    ["description"] = *string*  collectibleDescription,
+    ["hint"]        = *string*  hintText,
+    ["category"]    = *string*  categoryName,        -- 顶级分类名。
+    #["subcategory"]= *string*  subCategoryName,     -- 子分类名，顶级直属收藏品无此字段。
+    ["categoryType"]= CollectibleCategoryType,
+    ["furnitureId"] = *integer* furnitureDataId,      -- 若为家具收藏品则非0。
+    ["icon"]        = *string*  iconPath,
+  },
+  ...
+}
+]]
+
 --[[ 物品
 ["dataItems"] = {
   ["CollectibleFurniture"] = {
@@ -232,6 +275,8 @@
       ["name"] = *string* collectibleName,
       ["id"] = *integer* collectibleID,
       ["category"] = *string* categoryName,
+      ["categoryType"] = *integer* categoryType,
+      ["categoryId"] = *integer* categoryId,
       ["hint"] = *string* hintText,
       ["description"] = *string* collectibleDescription,
       ["icon"] = *string* iconPath,
@@ -342,6 +387,27 @@
     ["categoryName"] = *string*  顶级分类名称（如"盔甲外观"/"武器外观"）,
     #["slotId"]      = *integer* OUTFIT_SLOT_* 枚举值,
     #["slot"]        = *string*  时装槽位本地化名称,
+  },
+  ...
+}
+]]
+
+--[[ 染料
+["dataDyes"] = {
+  [*integer* dyeId] = {
+    ["id"]              = *integer* dyeId,
+    ["name"]            = *string*  染料名称,
+    ["known"]           = *bool*    当前账号是否已解锁,
+    ["rarity"]          = *integer* 稀有度 (0=Common, 1=Uncommon, 2=Rare, 3=Material),
+    ["rarityName"]      = *string*  稀有度本地化名称,
+    ["hueCategory"]     = *integer* 色调分类 (0=Red..8=Iridescent),
+    ["hueCategoryName"] = *string*  色调分类本地化名称,
+    ["r"]               = *number*  红色通道 (0~1),
+    ["g"]               = *number*  绿色通道 (0~1),
+    ["b"]               = *number*  蓝色通道 (0~1),
+    ["sortKey"]         = *integer* 排序键,
+    #["achievementId"]  = *integer* 关联成就ID,
+    #["achievementName"]= *string*  关联成就名称,
   },
   ...
 }

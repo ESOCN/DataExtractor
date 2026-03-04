@@ -12,6 +12,9 @@ Skills.lua
 CpSkills.lua
 Achievements.lua
 Items.lua
+Collectibles.lua
+Houses.lua
+Dyes.lua
 Styles.lua
 Outfits.lua
 Potions.lua

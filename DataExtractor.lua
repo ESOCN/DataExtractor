@@ -29,23 +29,29 @@ local DataExtractorDetails = {
             Recipes = {},
         },
         dataAchievs = {},
+        dataCollectibles = {},
+        dataHouses = {},
         dataStyles = {},
         dataOutfitStyles = {},
+        dataDyes = {},
     },
     -- 选项。
-    itemScanLimit       = 500000,               -- 扫描的物品ID数量上限。注意：最大值大约在20万左右。
+    itemScanLimit           = 2000000,           -- 扫描的物品ID数量上限。注意：最大值大约在20万左右。
     -- 数据。
     dataSkills      = {},                       -- 技能数据。
     dataCpSkills    = {},
     dataSets        = {},                       -- 存放所有套装的引用。
     dataFurniture   = {},                       -- 家具数据。
     dataCollectibleFurniture = {},              -- 家具收藏品数据。
+    dataCollectibles = {},                      -- 所有收藏品数据。
+    dataHouses = {},                            -- 住房数据。
     dataFoods       = {},
     dataPotions     = {},
     dataRecipes     = {},                       -- 配方数据。
     dataAchievs     = {},                       -- 成就数据。
     dataStyles      = {},                       -- 物品外观数据。
     dataOutfitStyles = {},                      -- 时装幻化外观样式数据。
+    dataDyes = {},                              -- 染料数据。
     -- 计数器。
     dataSkillLinesCounter = 0,
     dataSkillsCounter = 0,
@@ -54,6 +60,8 @@ local DataExtractorDetails = {
     dataFurnitureCounter = 0,
     dataFoodsCounter = 0,
     dataRecipesCounter = 0,
+    dataCollectiblesCounter = 0,
+    dataHousesCounter = 0,
 
     dataAchievsCounter = 0,
     dataAchievsCatCounter = 0,
@@ -61,12 +69,16 @@ local DataExtractorDetails = {
 
     dataStylesCounter = 0,
     dataOutfitStylesCounter = 0,
+    dataDyesCounter = 0,
     -- 追踪。
     scrapingSkills = false,                     -- 避免同一抓取器同时运行超过一次。
     scrapingItems = false,
+    scrapingCollectibles = false,
+    scrapingHouses = false,
     scrapingAchievs = false,
     scrapingStyles = false,
     scrapingOutfitStyles = false,
+    scrapingDyes = false,
     -- 异步追踪技能进度。
     currentType = nil,
     currentLine = nil,
@@ -79,6 +91,9 @@ local DataExtractorDetails = {
     slashStyles = '/scrapestyles',
     slashOutfitStyles = '/scrapeoutfitstyles',
     slashPotions = '/scrapepotions',
+    slashCollectibles = '/scrapecollectibles',
+    slashHouses = '/scrapehouses',
+    slashDyes = '/scrapedyes',
     
     slashSave = '/scrapesave',
 }
@@ -144,6 +159,7 @@ function DataExtractor.OnAddOnLoaded(event, addonName)
     SLASH_COMMANDS[DataExtractor.slashStyles] = DataExtractor.GetAllStyles
     SLASH_COMMANDS[DataExtractor.slashOutfitStyles] = DataExtractor.GetAllOutfitStyles
     SLASH_COMMANDS[DataExtractor.slashPotions] = DataExtractor.GetAllPotions
+    SLASH_COMMANDS[DataExtractor.slashDyes] = DataExtractor.GetAllDyes
 
     SLASH_COMMANDS[DataExtractor.slashSave] = SaveData
     
