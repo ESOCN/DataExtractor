@@ -11,6 +11,7 @@ local function SaveData()
     DataExtractor.savedVariables.dataItems.Recipes = DataExtractor.dataRecipes
     
     DataExtractor.savedVariables.dataStyles = DataExtractor.dataStyles
+    DataExtractor.savedVariables.dataOutfitStyles = DataExtractor.dataOutfitStyles
     DataExtractor.savedVariables.dataAchievs = DataExtractor.dataAchievs
     DataExtractor.savedVariables.dataRaids = DataExtractor.dataRaids
 
@@ -52,6 +53,7 @@ function DataExtractor.LoadSettings()
           DataExtractor.GetAllPotions()
           DataExtractor.GetAllAchievs()
           DataExtractor.GetAllStyles()
+          DataExtractor.GetAllOutfitStyles()
           DataExtractor.GetAllRaids()
           DataExtractor.GetAllItems()
         end,
@@ -96,6 +98,13 @@ function DataExtractor.LoadSettings()
         type = "button",
         name = "样式",
         func = function() DataExtractor.GetAllStyles() end,
+        width = "half",
+      },
+      {
+        type = "button",
+        name = "时装幻化",
+        tooltip = "提取所有时装幻化外观样式（Outfit Style）收藏品",
+        func = function() DataExtractor.GetAllOutfitStyles() end,
         width = "half",
       },
       {

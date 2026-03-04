@@ -13,6 +13,7 @@ CpSkills.lua
 Achievements.lua
 Items.lua
 Styles.lua
+Outfits.lua
 Potions.lua
 Raids.lua
 

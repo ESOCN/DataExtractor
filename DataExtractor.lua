@@ -30,6 +30,7 @@ local DataExtractorDetails = {
         },
         dataAchievs = {},
         dataStyles = {},
+        dataOutfitStyles = {},
     },
     -- 选项。
     itemScanLimit       = 500000,               -- 扫描的物品ID数量上限。注意：最大值大约在20万左右。
@@ -44,6 +45,7 @@ local DataExtractorDetails = {
     dataRecipes     = {},                       -- 配方数据。
     dataAchievs     = {},                       -- 成就数据。
     dataStyles      = {},                       -- 物品外观数据。
+    dataOutfitStyles = {},                      -- 时装幻化外观样式数据。
     -- 计数器。
     dataSkillLinesCounter = 0,
     dataSkillsCounter = 0,
@@ -58,11 +60,13 @@ local DataExtractorDetails = {
     dataAchievsSubcatCounter = 0,
 
     dataStylesCounter = 0,
+    dataOutfitStylesCounter = 0,
     -- 追踪。
     scrapingSkills = false,                     -- 避免同一抓取器同时运行超过一次。
     scrapingItems = false,
     scrapingAchievs = false,
     scrapingStyles = false,
+    scrapingOutfitStyles = false,
     -- 异步追踪技能进度。
     currentType = nil,
     currentLine = nil,
@@ -73,6 +77,7 @@ local DataExtractorDetails = {
     slashItems = '/scrapeitems',
     slashAchievs = '/scrapeachievs',
     slashStyles = '/scrapestyles',
+    slashOutfitStyles = '/scrapeoutfitstyles',
     slashPotions = '/scrapepotions',
     
     slashSave = '/scrapesave',
@@ -137,6 +142,7 @@ function DataExtractor.OnAddOnLoaded(event, addonName)
     SLASH_COMMANDS[DataExtractor.slashItems] = DataExtractor.GetAllItems
     SLASH_COMMANDS[DataExtractor.slashAchievs] = DataExtractor.GetAllAchievs
     SLASH_COMMANDS[DataExtractor.slashStyles] = DataExtractor.GetAllStyles
+    SLASH_COMMANDS[DataExtractor.slashOutfitStyles] = DataExtractor.GetAllOutfitStyles
     SLASH_COMMANDS[DataExtractor.slashPotions] = DataExtractor.GetAllPotions
 
     SLASH_COMMANDS[DataExtractor.slashSave] = SaveData

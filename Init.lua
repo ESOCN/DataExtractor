@@ -330,5 +330,22 @@
 }
 ]]
 
+--[[ 时装幻化外观样式
+["dataOutfitStyles"] = {
+  [*integer* collectibleId] = {
+    ["id"]           = *integer* collectibleId,
+    ["name"]         = *string*  外观样式名称,
+    #["description"] = *string*  描述文本,
+    #["hint"]        = *string*  获取途径提示,
+    ["icon"]         = *textureName* 图标路径,
+    ["unlocked"]     = *bool*    当前账号是否已解锁,
+    ["categoryName"] = *string*  顶级分类名称（如"盔甲外观"/"武器外观"）,
+    #["slotId"]      = *integer* OUTFIT_SLOT_* 枚举值,
+    #["slot"]        = *string*  时装槽位本地化名称,
+  },
+  ...
+}
+]]
+
 -- 初始化全局变量，供所有模块访问。
 DataExtractor = {}
