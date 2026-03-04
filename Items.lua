@@ -480,11 +480,6 @@ local function AddCollectibleFromID(i)
 
     local collectibleDescription = GetCollectibleDescription(i)
 
-    -- 没有描述，收藏品不可用，跳过。
-    if collectibleDescription == '' then
-        return
-    end
-
     local data = DataExtractor.dataCollectibleFurniture
 
     data[i] = {}
@@ -496,7 +491,9 @@ local function AddCollectibleFromID(i)
 
     item.description = collectibleDescription
     item.hint = GetCollectibleHint(i) -- 获取该收藏品的途径。
-    item.category = GetCollectibleCategoryName(i)
+    item.category = GetCollectibleCategoryNameByCollectibleId(i)
+    item.categoryType = GetCollectibleCategoryType(i)
+    item.categoryId = GetCollectibleCategoryId(i)
     item.icon = GetCollectibleIcon(i)
 
     DataExtractor.dataFurnitureCounter = DataExtractor.dataFurnitureCounter + 1
