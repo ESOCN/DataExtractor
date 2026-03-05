@@ -3,8 +3,9 @@
 -- categoryName   - (string) 顶级分类名。
 -- subCategoryName - (string|nil) 子分类名，顶级直属收藏品为 nil。
 -- categoryIcon   - (string) 顶级分类图标。
--- subcategoryIcon - (string|nil) 子分类图标，顶级直属收藏品为 nil。
-local function AddCollectible(collectibleId, categoryName, subCategoryName, categoryIcon, subcategoryIcon)
+-- categoryIconSelected - (string) 顶级分类选中图标。
+-- categoryIconHover - (string) 顶级分类悬停图标。
+local function AddCollectible(collectibleId, categoryName, subCategoryName, categoryIcon, categoryIconSelected, categoryIconHover)
     local collectibleName = GetCollectibleName(collectibleId)
     if collectibleName == '' then
         return
@@ -30,7 +31,8 @@ local function AddCollectible(collectibleId, categoryName, subCategoryName, cate
     item.achievementName = zo_strformat(SI_TOOLTIP_ITEM_NAME, GetAchievementInfo(item.linkedAchievement))
     item.link = GetCollectibleLink(collectibleId, LINK_STYLE_DEFAULT)
     item.categoryIcon = categoryIcon
-    item.subcategoryIcon = subcategoryIcon
+    item.categoryIconSelected = categoryIconSelected
+    item.categoryIconHover = categoryIconHover
 
     local numTags = GetNumCollectibleTags(collectibleId)
     if numTags > 0 then
@@ -49,12 +51,11 @@ end
 -- 处理某个分类（或子分类）下的所有收藏品。
 local function ProcessCollectibles(topLevelIndex, subCategoryIndex, categoryName, subCategoryName)
     local numCollectibles = GetNumCollectiblesInCollectibleCategory(topLevelIndex, subCategoryIndex)
-    local categoryIcon = GetCollectibleCategoryKeyboardIcons(topLevelIndex)
-    local subcategoryIcon,_,_,_ = GetCollectibleCategoryKeyboardIcons(topLevelIndex, subCategoryIndex)
+    local categoryIcon, categoryIconSelected, categoryIconHover, _ = GetCollectibleCategoryKeyboardIcons(topLevelIndex)
     for collectibleIndex = 1, numCollectibles do
         local collectibleId = GetCollectibleId(topLevelIndex, subCategoryIndex, collectibleIndex)
         if collectibleId and collectibleId > 0 then
-            AddCollectible(collectibleId, categoryName, subCategoryName, categoryIcon, subcategoryIcon)
+            AddCollectible(collectibleId, categoryName, subCategoryName, categoryIcon, categoryIconSelected, categoryIconHover)
         end
     end
 end
