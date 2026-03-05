@@ -2,7 +2,9 @@
 -- collectibleId  - (int) 收藏品ID。
 -- categoryName   - (string) 顶级分类名。
 -- subCategoryName - (string|nil) 子分类名，顶级直属收藏品为 nil。
-local function AddCollectible(collectibleId, categoryName, subCategoryName)
+-- categoryIcon   - (string) 顶级分类图标。
+-- subcategoryIcon - (string|nil) 子分类图标，顶级直属收藏品为 nil。
+local function AddCollectible(collectibleId, categoryName, subCategoryName, categoryIcon, subcategoryIcon)
     local collectibleName = GetCollectibleName(collectibleId)
     if collectibleName == '' then
         return
@@ -25,7 +27,10 @@ local function AddCollectible(collectibleId, categoryName, subCategoryName)
     item.icon = GetCollectibleIcon(collectibleId)
     item.cooldown, item.duration = GetCollectibleCooldownAndDuration(collectibleId)
     item.linkedAchievement = GetCollectibleLinkedAchievement(collectibleId)
+    item.achievementName = zo_strformat(SI_TOOLTIP_ITEM_NAME, GetAchievementInfo(item.linkedAchievement))
     item.link = GetCollectibleLink(collectibleId, LINK_STYLE_DEFAULT)
+    item.categoryIcon = categoryIcon
+    item.subcategoryIcon = subcategoryIcon
 
     local numTags = GetNumCollectibleTags(collectibleId)
     if numTags > 0 then
@@ -44,10 +49,12 @@ end
 -- 处理某个分类（或子分类）下的所有收藏品。
 local function ProcessCollectibles(topLevelIndex, subCategoryIndex, categoryName, subCategoryName)
     local numCollectibles = GetNumCollectiblesInCollectibleCategory(topLevelIndex, subCategoryIndex)
+    local categoryIcon = GetCollectibleCategoryKeyboardIcons(topLevelIndex)
+    local subcategoryIcon,_,_,_ = GetCollectibleCategoryKeyboardIcons(topLevelIndex, subCategoryIndex)
     for collectibleIndex = 1, numCollectibles do
         local collectibleId = GetCollectibleId(topLevelIndex, subCategoryIndex, collectibleIndex)
         if collectibleId and collectibleId > 0 then
-            AddCollectible(collectibleId, categoryName, subCategoryName)
+            AddCollectible(collectibleId, categoryName, subCategoryName, categoryIcon, subcategoryIcon)
         end
     end
 end

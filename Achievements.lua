@@ -204,7 +204,7 @@ function DataExtractor.GetAllAchievs()
     -- 遍历所有大类。
     for i = 1, 100 do
         local categoryName, numSubCategories, numAchievements, earnedPoints, totalPoints, hidesPoints = GetAchievementCategoryInfo(i)
-
+        local categoryIcon, _, _ = GetAchievementCategoryKeyboardIcons(i)
         if categoryName ~= '' then
             local data = DataExtractor.dataAchievs
             data[i] = {}
@@ -212,6 +212,7 @@ function DataExtractor.GetAllAchievs()
 
             category.name = categoryName
             category.totalpoints = totalPoints
+            category.icon = categoryIcon
             -- 注意：不要使用 numSubCategories 和 numAchievements！请改用计数器。
 
             DataExtractor.dataAchievsCatCounter = DataExtractor.dataAchievsCatCounter + 1
