@@ -19,6 +19,9 @@ Styles.lua
 Outfits.lua
 Potions.lua
 Raids.lua
+potionData\PotionEffectData.lua
+potionData\ReagentData.lua
+potionData\SolventData.lua
 
 DataExtractor.lua
 Settings.lua

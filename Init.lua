@@ -112,10 +112,14 @@
 --[[ 药水
 ["dataPotions"] = {
   [*integer* itemId] = {
-    [*integer* encodeId] = {
+    [*integer* sequentialIndex] = {
       ["name"] = *string* itemName,
       ["id"] = *integer* itemId,
-      ["encode"] = *integer* encodeId,
+      ["potionData"] = *integer* encodedEffects,
+      ["internalType"] = *integer* solventInternalType,
+      ["internalLevel"] = *integer* solventInternalLevel,
+      ["effectIds"] = {*integer* effectId, ...},
+      ["isPoison"] = *bool*,
       ["itemTypeText"] = *string* itemType,
       ["quality"] = *string* qualityType,
       ["description"] = {
@@ -124,10 +128,6 @@
       },
       ["icon"] = *string* iconPath,
       ["canBeCrafted"] = *bool*,
-      #["recipes"] = {
-        [*integer* recipeIndex] = {*string* reagentName, *string* reagentName, #*string* reagentName},
-        ...
-      }
     },
     ...
   },

@@ -105,7 +105,7 @@ function DataExtractor.LoadSettings()
         type = "button",
         name = "药水",
         func = function() DataExtractor.GetAllPotions() end,
-        tooltip = "需要解锁所有炼金材料的4个词条，且当前每种炼金材料持有至少1个，才可以获得所有的药水配方",
+        tooltip = "基于静态数据计算所有药水/毒药组合，无需持有炼金材料",
         width = "half",
       },
       {
