@@ -259,28 +259,30 @@ local function AddItemFromID(i)
             end
             item["place"] = zoneIds
         end
-
+-- 
         if not item["itemIDs"] then
             item["itemIDs"] = LibSets.GetSetItemIds(item.id) or {}
             for itemId, v in pairs(item["itemIDs"]) do
+                local part = {}
+                item["itemIDs"][itemId] = part
                 local itemLink = LibSets.buildItemLink(itemId)
 
-                local armorType = GetItemLinkArmorType(itemLink)
+                part.armorType = GetItemLinkArmorType(itemLink)
                 -- 0 无; 1 轻甲; 2 中甲; 3 重甲;
 
-                local equipType = GetItemLinkEquipType(itemLink)
+                part.equipType = GetItemLinkEquipType(itemLink)
                 -- 1 头部; 4 肩部; 3 胸部; 13 手部; 8 腰部; 9 腿部; 10 脚部;
                 -- 2 项链; 12 戒指;
                 -- 5 单手; 6 双手; 7 盾牌;
 
-                local weaponType = GetItemLinkWeaponType(itemLink)
+                part.weaponType = GetItemLinkWeaponType(itemLink)
                 -- 单手: 1 斧; 2 锤; 3 剑; 11 匕首;
                 -- 双手: 4 剑; 5 斧; 6 锤;
                 -- 法杖: 9 治疗; 12 火焰; 13 冰霜; 15 闪电;
                 -- 弓: 8
                 -- 盾牌: 14
-
-                item["itemIDs"][itemId] = {armorType, equipType, weaponType}
+                part.name = GetItemLinkName(itemLink)
+                part.icon = GetItemLinkIcon(itemLink)
             end
         end
         -----------------------------------------
