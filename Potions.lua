@@ -17,16 +17,12 @@
     链接格式：|H1:item:{itemId}:{intType}:{intLevel}:0:...(17个0)...:0:{potionData}|h|h
 
     优势：无需在背包中持有试剂，无需解锁词条，纯静态数据计算。
-]]
-
--- =============================================
+]] -- =============================================
 -- 数据引用（由 potionData/*.lua 预加载）
 -- =============================================
 local PotionEffects -- DataExtractor.PotionEffects
-local ReagentList   -- DataExtractor.ReagentList
-local SolventList   -- DataExtractor.SolventList
-
-
+local ReagentList -- DataExtractor.ReagentList
+local SolventList -- DataExtractor.SolventList
 
 -- =============================================
 -- 炼金计算核心函数
@@ -75,7 +71,9 @@ local function CombineReagentEffects(effects1, effects2, effects3)
     table.sort(combinedEffects, function(a, b)
         local effA = PotionEffects[a]
         local effB = PotionEffects[b]
-        if not effA or not effB then return false end
+        if not effA or not effB then
+            return false
+        end
         return effA.index < effB.index
     end)
 
@@ -107,10 +105,8 @@ end
 --- @param potionData number 编码后的药水数据
 --- @return string 游戏物品链接
 local function BuildPotionLink(itemId, internalType, internalLevel, potionData)
-    return string.format(
-        "|H1:item:%d:%d:%d:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:%d|h|h",
-        itemId, internalType, internalLevel, potionData
-    )
+    return string.format("|H1:item:%d:%d:%d:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0:%d|h|h", itemId, internalType,
+        internalLevel, potionData)
 end
 
 -- =============================================
@@ -122,7 +118,9 @@ end
 --- @return table|nil 药水信息，如果链接无效则返回 nil
 local function ExtractPotionInfo(link)
     local name = GetItemLinkName(link)
-    if not name or name == "" then return nil end
+    if not name or name == "" then
+        return nil
+    end
 
     name = zo_strformat(SI_TOOLTIP_ITEM_NAME, name)
     local icon = GetItemLinkIcon(link)
@@ -134,9 +132,18 @@ local function ExtractPotionInfo(link)
     -- GetItemLinkOnUseAbilityInfo 用于消耗品（药水/毒药）的使用效果
     -- GetItemLinkTraitOnUseAbilityInfo 是装备词条效果，不适用于药水
     local description = ""
-    local hasUseAbility, useAbilityHeader, useAbilityDesc, useAbilityCooldown = GetItemLinkOnUseAbilityInfo(link)
-    if hasUseAbility and useAbilityDesc and useAbilityDesc ~= "" then
-        description = useAbilityDesc
+    local traitAbilityCount = 0
+    local cooldown = 0
+    for i = 1, GetMaxTraits() do
+        local hasTraitAbility, traitAbilityDescription, traitCooldown = GetItemLinkTraitOnUseAbilityInfo(link, i)
+
+        if (hasTraitAbility) then
+            traitAbilityCount = traitAbilityCount + 1
+            if traitAbilityDescription and traitAbilityDescription ~= "" then
+                description = description .. zo_strformat(SI_TOOLTIP_ITEM_NAME, traitAbilityDescription) .. "\n"
+            end
+        end
+        cooldown = traitCooldown or 0
     end
 
     return {
@@ -145,6 +152,7 @@ local function ExtractPotionInfo(link)
         quality = quality,
         itemTypeText = itemTypeText,
         description = description,
+        cooldown = cooldown
     }
 end
 
@@ -156,8 +164,8 @@ end
 function DataExtractor.GetAllPotions()
     -- 加载静态数据引用
     PotionEffects = DataExtractor.PotionEffects
-    ReagentList   = DataExtractor.ReagentList
-    SolventList   = DataExtractor.SolventList
+    ReagentList = DataExtractor.ReagentList
+    SolventList = DataExtractor.SolventList
 
     if not PotionEffects or not ReagentList or not SolventList then
         d("|cFFFFFFDataExtractor:|r |cFF0000错误: 药水静态数据未加载! 请检查 potionData 文件夹。|r")
@@ -178,40 +186,33 @@ function DataExtractor.GetAllPotions()
     for i = 1, numReagents do
         for j = i + 1, numReagents do
             -- 2 试剂组合
-            local effects2 = CombineReagentEffects(
-                ReagentList[i].effects,
-                ReagentList[j].effects,
-                {}
-            )
+            local effects2 = CombineReagentEffects(ReagentList[i].effects, ReagentList[j].effects, {})
             if #effects2 > 0 then
                 local pd = EncodePotionData(effects2)
                 if not effectCombinations[pd] then
-                    effectCombinations[pd] = { effects = effects2, recipes = {} }
+                    effectCombinations[pd] = {
+                        effects = effects2,
+                        recipes = {}
+                    }
                 end
-                table.insert(effectCombinations[pd].recipes, {
-                    ReagentList[i].name,
-                    ReagentList[j].name,
-                })
+                table.insert(effectCombinations[pd].recipes, {ReagentList[i].name, ReagentList[j].name})
                 totalCombos = totalCombos + 1
             end
 
             -- 3 试剂组合
             for k = j + 1, numReagents do
-                local effects3 = CombineReagentEffects(
-                    ReagentList[i].effects,
-                    ReagentList[j].effects,
-                    ReagentList[k].effects
-                )
+                local effects3 = CombineReagentEffects(ReagentList[i].effects, ReagentList[j].effects,
+                    ReagentList[k].effects)
                 if #effects3 > 0 then
                     local pd = EncodePotionData(effects3)
                     if not effectCombinations[pd] then
-                        effectCombinations[pd] = { effects = effects3, recipes = {} }
+                        effectCombinations[pd] = {
+                            effects = effects3,
+                            recipes = {}
+                        }
                     end
-                    table.insert(effectCombinations[pd].recipes, {
-                        ReagentList[i].name,
-                        ReagentList[j].name,
-                        ReagentList[k].name,
-                    })
+                    table.insert(effectCombinations[pd].recipes,
+                        {ReagentList[i].name, ReagentList[j].name, ReagentList[k].name})
                     totalCombos = totalCombos + 1
                 end
             end
@@ -221,10 +222,11 @@ function DataExtractor.GetAllPotions()
     d(string.format("|cFFFFFFDataExtractor:|r 效果组合枚举完毕: %d 个组合 -> %d 种独立效果组",
         totalCombos, (function()
             local count = 0
-            for _ in pairs(effectCombinations) do count = count + 1 end
+            for _ in pairs(effectCombinations) do
+                count = count + 1
+            end
             return count
-        end)()
-    ))
+        end)()))
 
     -- =========================================
     -- 阶段 2: 生成链接并读取 Tooltip
@@ -242,28 +244,23 @@ function DataExtractor.GetAllPotions()
                 for si = 1, #SolventList do
                     local solvent = SolventList[si]
                     if not solvent.isPoison then
-                        local link = BuildPotionLink(
-                            potionItemId,
-                            solvent.internalType,
-                            solvent.internalLevel,
-                            pd
-                        )
+                        local link = BuildPotionLink(potionItemId, solvent.internalType, solvent.internalLevel, pd)
                         local info = ExtractPotionInfo(link)
                         if info then
                             result[potionItemId] = result[potionItemId] or {}
                             table.insert(result[potionItemId], {
-                                id            = potionItemId,
-                                potionData    = pd,
-                                internalType  = solvent.internalType,
+                                id = potionItemId,
+                                potionData = pd,
+                                internalType = solvent.internalType,
                                 internalLevel = solvent.internalLevel,
-                                effectIds     = combo.effects,
-                                isPoison      = false,
-                                name          = info.name,
-                                quality       = info.quality,
-                                icon          = info.icon,
-                                itemTypeText  = info.itemTypeText,
-                                description   = info.description,
-                                canBeCrafted  = true,
+                                effectIds = combo.effects,
+                                isPoison = false,
+                                name = info.name,
+                                quality = info.quality,
+                                icon = info.icon,
+                                itemTypeText = info.itemTypeText,
+                                description = info.description,
+                                canBeCrafted = true
                             })
                             potionCount = potionCount + 1
                         end
@@ -277,28 +274,23 @@ function DataExtractor.GetAllPotions()
                 for si = 1, #SolventList do
                     local solvent = SolventList[si]
                     if solvent.isPoison then
-                        local link = BuildPotionLink(
-                            poisonItemId,
-                            solvent.internalType,
-                            solvent.internalLevel,
-                            pd
-                        )
+                        local link = BuildPotionLink(poisonItemId, solvent.internalType, solvent.internalLevel, pd)
                         local info = ExtractPotionInfo(link)
                         if info then
                             result[poisonItemId] = result[poisonItemId] or {}
                             table.insert(result[poisonItemId], {
-                                id            = poisonItemId,
-                                potionData    = pd,
-                                internalType  = solvent.internalType,
+                                id = poisonItemId,
+                                potionData = pd,
+                                internalType = solvent.internalType,
                                 internalLevel = solvent.internalLevel,
-                                effectIds     = combo.effects,
-                                isPoison      = true,
-                                name          = info.name,
-                                quality       = info.quality,
-                                icon          = info.icon,
-                                itemTypeText  = info.itemTypeText,
-                                description   = info.description,
-                                canBeCrafted  = true,
+                                effectIds = combo.effects,
+                                isPoison = true,
+                                name = info.name,
+                                quality = info.quality,
+                                icon = info.icon,
+                                itemTypeText = info.itemTypeText,
+                                description = info.description,
+                                canBeCrafted = true
                             })
                             poisonCount = poisonCount + 1
                         end
