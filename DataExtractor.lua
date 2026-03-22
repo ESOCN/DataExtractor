@@ -30,6 +30,7 @@ local DataExtractorDetails = {
         },
         dataAchievs = {},
         dataCollectibles = {},
+        dataAntiquities = {},
         dataHouses = {},
         dataStyles = {},
         dataOutfitStyles = {},
@@ -44,6 +45,7 @@ local DataExtractorDetails = {
     dataFurniture   = {},                       -- 家具数据。
     dataCollectibleFurniture = {},              -- 家具收藏品数据。
     dataCollectibles = {},                      -- 所有收藏品数据。
+    dataAntiquities = {},                       -- 古物线索数据。
     dataHouses = {},                            -- 住房数据。
     dataFoods       = {},
     dataPotions     = {},
@@ -52,6 +54,8 @@ local DataExtractorDetails = {
     dataStyles      = {},                       -- 物品外观数据。
     dataOutfitStyles = {},                      -- 时装幻化外观样式数据。
     dataDyes = {},                              -- 染料数据。
+    dataItems = {},                             -- 所有物品数据。
+
     -- 计数器。
     dataSkillLinesCounter = 0,
     dataSkillsCounter = 0,
@@ -61,6 +65,7 @@ local DataExtractorDetails = {
     dataFoodsCounter = 0,
     dataRecipesCounter = 0,
     dataCollectiblesCounter = 0,
+    dataAntiquitiesCounter = 0,
     dataHousesCounter = 0,
 
     dataAchievsCounter = 0,
@@ -74,6 +79,7 @@ local DataExtractorDetails = {
     scrapingSkills = false,                     -- 避免同一抓取器同时运行超过一次。
     scrapingItems = false,
     scrapingCollectibles = false,
+    scrapingAntiquities = false,
     scrapingHouses = false,
     scrapingAchievs = false,
     scrapingStyles = false,
@@ -92,6 +98,7 @@ local DataExtractorDetails = {
     slashOutfitStyles = '/scrapeoutfitstyles',
     slashPotions = '/scrapepotions',
     slashCollectibles = '/scrapecollectibles',
+    slashAntiquities = '/scrapeantiquities',
     slashHouses = '/scrapehouses',
     slashDyes = '/scrapedyes',
     
@@ -128,6 +135,7 @@ local function SaveData()
     DataExtractor.savedVariables.dataItems.Recipes = DataExtractor.dataRecipes
 
     DataExtractor.savedVariables.dataAchievs = DataExtractor.dataAchievs
+    DataExtractor.savedVariables.dataAntiquities = DataExtractor.dataAntiquities
 
     ReloadUI("ingame")
 end
@@ -159,6 +167,7 @@ function DataExtractor.OnAddOnLoaded(event, addonName)
     SLASH_COMMANDS[DataExtractor.slashStyles] = DataExtractor.GetAllStyles
     SLASH_COMMANDS[DataExtractor.slashOutfitStyles] = DataExtractor.GetAllOutfitStyles
     SLASH_COMMANDS[DataExtractor.slashPotions] = DataExtractor.GetAllPotions
+    SLASH_COMMANDS[DataExtractor.slashAntiquities] = DataExtractor.GetAllAntiquities
     SLASH_COMMANDS[DataExtractor.slashDyes] = DataExtractor.GetAllDyes
 
     SLASH_COMMANDS[DataExtractor.slashSave] = SaveData

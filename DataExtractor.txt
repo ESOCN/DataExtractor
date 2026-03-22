@@ -13,6 +13,8 @@ CpSkills.lua
 Achievements.lua
 Items.lua
 Collectibles.lua
+locationsdata_zh.lua
+Antiquity.lua
 Houses.lua
 Dyes.lua
 Styles.lua

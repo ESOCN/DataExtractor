@@ -164,7 +164,7 @@ local function AddItemFromID(i)
     -- Format.
     itemName = zo_strformat(SI_TOOLTIP_ITEM_NAME, itemName)
 
-    -- Sets.
+    -- 装备
     if hasSet then
         local data = DataExtractor.dataSets
 
@@ -259,7 +259,6 @@ local function AddItemFromID(i)
             end
             item["place"] = zoneIds
         end
--- 
         if not item["itemIDs"] then
             item["itemIDs"] = LibSets.GetSetItemIds(item.id) or {}
             for itemId, v in pairs(item["itemIDs"]) do
@@ -330,10 +329,9 @@ local function AddItemFromID(i)
         DataExtractor.dataSetsCounter = DataExtractor.dataSetsCounter + 1
 
         return true
-    end
 
-    -- 家具。
-    if itemType == ITEMTYPE_FURNISHING then
+    -- 家具
+    elseif itemType == ITEMTYPE_FURNISHING then
         local data = DataExtractor.dataFurniture
 
         data[i] = {}
@@ -378,10 +376,9 @@ local function AddItemFromID(i)
         DataExtractor.dataFurnitureCounter = DataExtractor.dataFurnitureCounter + 1
 
         return true
-    end
 
     -- 食物。
-    if (itemType == ITEMTYPE_DRINK or itemType == ITEMTYPE_FOOD) and IsItemLinkConsumable(link) then
+    elseif (itemType == ITEMTYPE_DRINK or itemType == ITEMTYPE_FOOD) and IsItemLinkConsumable(link) then
         local item = {
             ["id"] = i,
             ["name"] = itemName,
@@ -396,10 +393,9 @@ local function AddItemFromID(i)
         DataExtractor.dataFoods[i] = item
         DataExtractor.dataFoodsCounter = DataExtractor.dataFoodsCounter + 1
         return true
-    end
 
     -- 配方。
-    if itemType == ITEMTYPE_RECIPE then
+    elseif itemType == ITEMTYPE_RECIPE then
         local data = DataExtractor.dataRecipes
 
         data[i] = {}
@@ -459,6 +455,15 @@ local function AddItemFromID(i)
 
         return true
     end
+
+    local data = DataExtractor.dataItems
+    data[i] = {}
+    local item1 = data[i]
+    item1.id = i
+    item1.name = itemName
+    item1.type = itemType
+    item1.specialType = specializedItemType
+
 end
 
 -- 向数据库添加收藏品（仅限可用作家具的收藏品）。

@@ -16,6 +16,7 @@ local function SaveData()
     DataExtractor.savedVariables.dataOutfitStyles = DataExtractor.dataOutfitStyles
     DataExtractor.savedVariables.dataDyes = DataExtractor.dataDyes
     DataExtractor.savedVariables.dataAchievs = DataExtractor.dataAchievs
+    DataExtractor.savedVariables.dataAntiquities = DataExtractor.dataAntiquities
     DataExtractor.savedVariables.dataRaids = DataExtractor.dataRaids
 
     ReloadUI("ingame")
@@ -58,6 +59,7 @@ function DataExtractor.LoadSettings()
           DataExtractor.GetAllStyles()
           DataExtractor.GetAllOutfitStyles()
           DataExtractor.GetAllRaids()
+          DataExtractor.GetAllAntiquities()
           DataExtractor.GetAllItems()
           DataExtractor.GetAllCollectibles()
           DataExtractor.GetAllHouses()
@@ -139,6 +141,13 @@ function DataExtractor.LoadSettings()
         name = "副本",
         tooltip = "需要 Pithka's Achievement Tracker 插件",
         func = function() DataExtractor.GetAllRaids() end,
+        width = "half",
+      },
+      {
+        type = "button",
+        name = "古物线索",
+        tooltip = "提取所有古物线索数据（含掉落信息、知识条目等）",
+        func = function() DataExtractor.GetAllAntiquities() end,
         width = "half",
       },
       {

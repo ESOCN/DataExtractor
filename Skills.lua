@@ -8,11 +8,13 @@ local function GetPowerTypes(abilityId)
         local newData = {}
         for i = 1, 4 do
             local powerType = GetNextAbilityMechanicFlag(abilityId, lastPowerType)
-            if powerType and (powerType == COMBAT_MECHANIC_FLAGS_HEALTH or powerType == COMBAT_MECHANIC_FLAGS_MAGICKA or powerType == COMBAT_MECHANIC_FLAGS_STAMINA) then
-              newData[powerType] = GetAbilityCost(abilityId,powerType, nil, MAX_RANKS_PER_ABILITY) -- add cost over time ??
-              lastPowerType = powerType
+            if powerType and
+                (powerType == COMBAT_MECHANIC_FLAGS_HEALTH or powerType == COMBAT_MECHANIC_FLAGS_MAGICKA or powerType ==
+                    COMBAT_MECHANIC_FLAGS_STAMINA) then
+                newData[powerType] = GetAbilityCost(abilityId, powerType, nil, MAX_RANKS_PER_ABILITY) -- add cost over time ??
+                lastPowerType = powerType
             elseif powerType == nil then
-              break
+                break
             end
         end
         powerTypeCache[abilityId] = newData
@@ -20,6 +22,48 @@ local function GetPowerTypes(abilityId)
     return powerTypeCache[abilityId]
 end
 -----------------------------------------
+
+-- 新增：缓存 progressionId -> collectibleId 列表，避免重复遍历
+local styleCache = {}
+
+-- 获取某个技能的所有可能技能样式 collectibleId 列表（全局完整，包括未解锁的）
+local function GetAllStyleCollectibleIdsForSkill(progressionId)
+    if progressionId == 0 or progressionId == nil then
+        return {}
+    end
+
+    if styleCache[progressionId] then
+        return styleCache[progressionId]
+    end
+
+    local styleIds = {}
+
+    -- 使用全局迭代器（可靠，不依赖 category）
+    for _, collectibleData in ZO_COLLECTIBLE_DATA_MANAGER:CollectibleIterator() do
+        if collectibleData then
+            -- 过滤：只处理 ABILITY_FX_OVERRIDE 分类的 collectible
+            local catType = collectibleData:GetCategoryType()
+            if catType == COLLECTIBLE_CATEGORY_TYPE_ABILITY_FX_OVERRIDE then
+                -- 匹配 progressionId
+                local skillProgId = collectibleData:GetSkillStyleProgressionId()
+                if skillProgId == progressionId then
+                    local cid = collectibleData:GetId()
+                    if cid and cid > 0 then
+                        table.insert(styleIds, cid)
+                    end
+                end
+            end
+        end
+    end
+
+    -- 按 ID 排序，保持稳定顺序
+    table.sort(styleIds)
+
+    styleCache[progressionId] = styleIds
+    return styleIds
+end
+
+
 
 local function UpdateSkillsPosition(i, j, line, k, skillsLimit, linesLimit)
     -- 该技能线的所有技能已完成！也处理空技能线的情况。
@@ -29,13 +73,10 @@ local function UpdateSkillsPosition(i, j, line, k, skillsLimit, linesLimit)
             -- 所有类型的所有技能线的所有技能均已完成！大功告成。
             if i == SKILL_TYPE_MAX_VALUE then
                 -- 打印汇总信息。
-                d(
-                    string.format(
-                        '|cFFFFFFDataExtractor:|r 完工! 类别: %s 技能线: %s 技能: %s. (使用 %s 指令来保存数据!)',
-                        SKILL_TYPE_MAX_VALUE, DataExtractor.dataSkillLinesCounter, DataExtractor.dataSkillsCounter,
-                        DataExtractor.slashSave
-                    )
-                )
+                d(string.format(
+                    '|cFFFFFFDataExtractor:|r 完工! 类别: %s 技能线: %s 技能: %s. (使用 %s 指令来保存数据!)',
+                    SKILL_TYPE_MAX_VALUE, DataExtractor.dataSkillLinesCounter, DataExtractor.dataSkillsCounter,
+                    DataExtractor.slashSave))
                 -- 更新追踪状态。
                 DataExtractor.scrapingSkills = false
             else
@@ -54,79 +95,87 @@ end
 
 local scripts
 local function AddCraftedSkill(i, j, k, skill)
-  --First run
-  if not scripts then
-    scripts = {}
-    for i = 1, #SCRIBING_DATA_MANAGER.craftedAbilityScriptObjects do
-      scripts[i] = {
-        ["id"] = i,
-        ["name"] = GetCraftedAbilityScriptDisplayName(i),
-        ["description"] = GetCraftedAbilityScriptGeneralDescription(i),
-        ["icon"] = GetCraftedAbilityScriptIcon(i),
-      }
-    end
-    DataExtractor.dataSkills.scriptList = scripts
-  end
-  
-  local craftAbilityList = SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable
-  
-  local craftAbilityId = GetCraftedAbilitySkillCraftedAbilityId(i, j, k)
-  local craftAbilityName = GetCraftedAbilityDisplayName(craftAbilityId)
-  local craftAbilityDescription = GetCraftedAbilityDescription(craftAbilityId)
-  local craftAbilityIcon = GetCraftedAbilityIcon(craftAbilityId)
-  skill["id"] = craftAbilityId
-  skill["name"] = craftAbilityName
-  skill["description"] = craftAbilityDescription
-  skill["icon"] = craftAbilityIcon
-  
-  local fScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][1]
-  local sScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][2]
-  local tScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][3]
-  
-  for k, primary in pairs(fScripts) do
-    for k, secondary in pairs(sScripts) do
-      for k, tertiary in pairs(tScripts) do 
-        if IsScribableScriptCombinationForCraftedAbility(craftAbilityId, primary, secondary, tertiary) then
-          SetCraftedAbilityScriptSelectionOverride(craftAbilityId, primary, secondary, tertiary)
-          local abilityId = GetCraftedAbilityRepresentativeAbilityId(craftAbilityId)
-          table.insert(skill, {
-            ["id"] = abilityId,
-            ["parentAbilityId"] = craftAbilityId,
-            ["scripts"] = {primary, secondary, tertiary},
-            ["name"] = GetAbilityName(abilityId),
-            ["description"] = 
-              GetAbilityDescription(abilityId).."\r\n\r\n"..
-              GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 1).."\r\n\r\n"..
-              GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 2).."\r\n\r\n"..
-              GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 3),
-            ["icon"] = GetAbilityIcon(abilityId),
-            ["isTank"] = select(1, GetAbilityRoles(abilityId)),
-            ["isHealer"] = select(2, GetAbilityRoles(abilityId)),
-            ["isDamage"] = select(3, GetAbilityRoles(abilityId)),
-            ["ultimate"] = IsAbilityUltimate(abilityId),
-            ["isChanneled"] = select(1, GetAbilityCastInfo(abilityId)),
-            ["castTime"] = select(2, GetAbilityCastInfo(abilityId)),
-            ["passive"] = IsAbilityPassive(abilityId),
-            ["IsCrafted"] = true,
-            ["earnedRank"] = 0,
-            ["cost"] = GetAbilityCost(abilityId),
-            ["costPerTick"] = {GetAbilityCostPerTick(GetCurrentChainedAbility(abilityId)), GetAbilityFrequencyMS(abilityId)},
-            ["minRange"] = select(1, GetAbilityRange(abilityId)),
-            ["maxRange"] = select(2, GetAbilityRange(abilityId)),
-            ["powerTypes"] = GetPowerTypes(abilityId),
-            ["radius"] = GetAbilityRadius(abilityId),
-            ["distance"] = GetAbilityAngleDistance(abilityId),
-            ["duration"] = GetAbilityDuration(abilityId),
-            ["target"] = GetAbilityTargetDescription(abilityId),
-            ["descHeader"] = GetAbilityDescriptionHeader(abilityId),
-          })
-          ResetCraftedAbilityScriptSelectionOverride()
+    -- First run
+    if not scripts then
+        scripts = {}
+        for i = 1, #SCRIBING_DATA_MANAGER.craftedAbilityScriptObjects do
+            scripts[i] = {
+                ["id"] = i,
+                ["name"] = GetCraftedAbilityScriptDisplayName(i),
+                ["description"] = GetCraftedAbilityScriptGeneralDescription(i),
+                ["icon"] = GetCraftedAbilityScriptIcon(i)
+            }
         end
-      end
+        DataExtractor.dataSkills.scriptList = scripts
     end
-  end
-  
-  return skill
+
+    local craftAbilityList = SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable
+
+    local craftAbilityId = GetCraftedAbilitySkillCraftedAbilityId(i, j, k)
+    local craftAbilityName = GetCraftedAbilityDisplayName(craftAbilityId)
+    local craftAbilityDescription = GetCraftedAbilityDescription(craftAbilityId)
+    local craftAbilityIcon = GetCraftedAbilityIcon(craftAbilityId)
+    skill["id"] = craftAbilityId
+    skill["name"] = craftAbilityName
+    skill["description"] = craftAbilityDescription
+    skill["icon"] = craftAbilityIcon
+
+    local fScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][1]
+    local sScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][2]
+    local tScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][3]
+
+    for k, primary in pairs(fScripts) do
+        for k, secondary in pairs(sScripts) do
+            for k, tertiary in pairs(tScripts) do
+                if IsScribableScriptCombinationForCraftedAbility(craftAbilityId, primary, secondary, tertiary) then
+                    SetCraftedAbilityScriptSelectionOverride(craftAbilityId, primary, secondary, tertiary)
+                    local abilityId = GetCraftedAbilityRepresentativeAbilityId(craftAbilityId)
+
+                    local subSkill = {
+                        ["id"] = abilityId,
+                        ["parentAbilityId"] = craftAbilityId,
+                        ["scripts"] = {primary, secondary, tertiary},
+                        ["name"] = GetAbilityName(abilityId),
+                        ["description"] = GetAbilityDescription(abilityId) .. "\r\n\r\n" ..
+                            GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 1) .. "\r\n\r\n" ..
+                            GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 2) .. "\r\n\r\n" ..
+                            GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 3),
+                        ["icon"] = GetAbilityIcon(abilityId),
+                        ["isTank"] = select(1, GetAbilityRoles(abilityId)),
+                        ["isHealer"] = select(2, GetAbilityRoles(abilityId)),
+                        ["isDamage"] = select(3, GetAbilityRoles(abilityId)),
+                        ["ultimate"] = IsAbilityUltimate(abilityId),
+                        ["isChanneled"] = select(1, GetAbilityCastInfo(abilityId)),
+                        ["castTime"] = select(2, GetAbilityCastInfo(abilityId)),
+                        ["passive"] = IsAbilityPassive(abilityId),
+                        ["IsCrafted"] = true,
+                        ["earnedRank"] = 0,
+                        ["cost"] = GetAbilityCost(abilityId),
+                        ["costPerTick"] = {GetAbilityCostPerTick(GetCurrentChainedAbility(abilityId)),
+                                           GetAbilityFrequencyMS(abilityId)},
+                        ["minRange"] = select(1, GetAbilityRange(abilityId)),
+                        ["maxRange"] = select(2, GetAbilityRange(abilityId)),
+                        ["powerTypes"] = GetPowerTypes(abilityId),
+                        ["radius"] = GetAbilityRadius(abilityId),
+                        ["distance"] = GetAbilityAngleDistance(abilityId),
+                        ["duration"] = GetAbilityDuration(abilityId),
+                        ["target"] = GetAbilityTargetDescription(abilityId),
+                        ["descHeader"] = GetAbilityDescriptionHeader(abilityId)
+                    }
+
+                    -- 新增：尝试为 Scribing 组合的代表 ability 添加样式 collectibleId 列表
+                    local progressionId = GetProgressionSkillProgressionId(i, j, k) -- 可能为 0 或 nil
+                    subSkill.styleCollectibleIds = GetAllStyleCollectibleIdsForSkill(progressionId)
+
+                    table.insert(skill, subSkill)
+
+                    ResetCraftedAbilityScriptSelectionOverride()
+                end
+            end
+        end
+    end
+
+    return skill
 end
 
 -- 获取单个技能。
@@ -135,25 +184,25 @@ local function AddSkill(i, j, line, k, skillsLimit, linesLimit)
     if DataExtractor.currentSkill ~= k then
         -- 如果已切换到下一类型或技能线，则停止等待。
         if DataExtractor.currentType == i and DataExtractor.currentLine == j then
-            zo_callLater(function() AddSkill(i, j, line, k, skillsLimit, linesLimit) end, 100)
+            zo_callLater(function()
+                AddSkill(i, j, line, k, skillsLimit, linesLimit)
+            end, 100)
         end
         return
     end
 
-    -- d('adding skill ' .. k)
-
     local skills = line.skills -- Reference
     skills[k] = {}
     local skill = skills[k] -- Reference
-    
+
     if IsCraftedAbilitySkill(i, j, k) then
-      skill.IsCrafted = true
-      skill = AddCraftedSkill(i, j, k, skill)
-      DataExtractor.dataSkillsCounter = DataExtractor.dataSkillsCounter + 1
-      UpdateSkillsPosition(i, j, line, k, skillsLimit, linesLimit)
-      return
+        skill.IsCrafted = true
+        skill = AddCraftedSkill(i, j, k, skill)
+        DataExtractor.dataSkillsCounter = DataExtractor.dataSkillsCounter + 1
+        UpdateSkillsPosition(i, j, line, k, skillsLimit, linesLimit)
+        return
     else
-      skill.IsCrafted = false
+        skill.IsCrafted = false
     end
 
     -- 仅基础技能，下方包含被动升级和主动变体。
@@ -180,7 +229,7 @@ local function AddSkill(i, j, line, k, skillsLimit, linesLimit)
         -- 属性名保持一致。对于被动技能，此处表示解锁所需的技能等级。
         skill.earnedRank = earnedRank
 
-	-- 添加 GetPowerTypes 方法，由 @Chicor 贡献 ---------
+        -- 添加 GetPowerTypes 方法，由 @Chicor 贡献 ---------
         skill.powerTypes = GetPowerTypes(aid)
         -----------------------------------------
         skill.cost = GetAbilityCost(aid, MAX_RANKS_PER_ABILITY)
@@ -193,6 +242,9 @@ local function AddSkill(i, j, line, k, skillsLimit, linesLimit)
         skill.isTank, skill.isHealer, skill.isDamage = GetAbilityRoles(aid)
         skill.target = GetAbilityTargetDescription(aid, MAX_RANKS_PER_ABILITY)
         skill.descHeader = GetAbilityDescriptionHeader(aid, MAX_RANKS_PER_ABILITY)
+
+        -- 新增：被动技能一般没有样式，但仍尝试添加（通常为空）
+        skill.styleCollectibleIds = GetAllStyleCollectibleIdsForSkill(pid)
 
         -- 获取被动技能的升级信息。
         if passive then
@@ -228,6 +280,9 @@ local function AddSkill(i, j, line, k, skillsLimit, linesLimit)
                 s.isTank, s.isHealer, s.isDamage = GetAbilityRoles(aid)
                 s.target = GetAbilityTargetDescription(aid, MAX_RANKS_PER_ABILITY)
                 s.descHeader = GetAbilityDescriptionHeader(aid, MAX_RANKS_PER_ABILITY)
+
+                -- 新增：被动升级也尝试添加样式（通常为空）
+                s.styleCollectibleIds = GetAllStyleCollectibleIdsForSkill(pid)
 
                 s.parentAbilityId = skill.id
             end
@@ -272,6 +327,9 @@ local function AddSkill(i, j, line, k, skillsLimit, linesLimit)
             s.target = GetAbilityTargetDescription(aid, MAX_RANKS_PER_ABILITY)
             s.descHeader = GetAbilityDescriptionHeader(aid, MAX_RANKS_PER_ABILITY)
 
+            -- 新增：为每个 morph 添加样式 collectibleId 列表（大多数情况下基础和 morph 共享同一个 progressionId 的样式）
+            s.styleCollectibleIds = GetAllStyleCollectibleIdsForSkill(pid)
+
             if x > MORPH_SLOT_MIN_VALUE then
                 -- 变体专有字段。
                 s.parentAbilityId = skill.id
@@ -291,12 +349,12 @@ local function AddLine(data, i, j, linesLimit)
     if DataExtractor.currentLine ~= j then
         -- 如果已切换到下一类型，则停止等待。
         if DataExtractor.currentType == i then
-            zo_callLater(function() AddLine(data, i, j, linesLimit) end, 200)
+            zo_callLater(function()
+                AddLine(data, i, j, linesLimit)
+            end, 200)
         end
         return
     end
-
-    -- d('adding line ' .. j)
 
     local name, rank, unlocked, notid, a, unlock, b, c = GetSkillLineInfo(i, j)
 
@@ -306,13 +364,7 @@ local function AddLine(data, i, j, linesLimit)
     line.skills = {} -- 存放该技能线下的所有技能。
 
     line.name = name
-    -- line.rank = rank
-    -- line.unlocked = unlocked
     line.id = notid
-    -- line.unlock = unlock
-    -- line.a = a
-    -- line.b = b
-    -- line.c = b
 
     DataExtractor.dataSkillLinesCounter = DataExtractor.dataSkillLinesCounter + 1
 
@@ -337,11 +389,11 @@ end
 local function AddType(i)
     -- 等待直到准备好调用。
     if DataExtractor.currentType ~= i then
-        zo_callLater(function() AddType(i) end, 500)
+        zo_callLater(function()
+            AddType(i)
+        end, 500)
         return
     end
-
-    -- d('doing type ' .. i)
 
     local typeName = GetString("SI_SKILLTYPE", i)
 
