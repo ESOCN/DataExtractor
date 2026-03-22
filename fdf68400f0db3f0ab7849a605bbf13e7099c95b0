@@ -1,0 +1,29 @@
+Antiquity.lua
+  fdea2ec4ca999a9e 1-25,29-175
+DataExtractor.lua
+  fdea2ec4ca999a9e 33,48,68,82,101,138,170
+Settings.lua
+  fdea2ec4ca999a9e 19,62,147-152
+DataExtractor.txt
+  fdea2ec4ca999a9e 16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "fdf68400f0db3f0ab7849a605bbf13e7099c95b0",
+  "prompts": {
+    "fdea2ec4ca999a9e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e28a3e04-070f-4750-85bc-b5975d304307",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "RodMajors <pro-vana@outlook.com>",
+      "messages": [],
+      "total_additions": 388,
+      "total_deletions": 198,
+      "accepted_lines": 201,
+      "overriden_lines": 0
+    }
+  }
+}
