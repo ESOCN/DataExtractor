@@ -11,13 +11,14 @@ local function SaveData()
     DataExtractor.savedVariables.dataItems.Recipes = DataExtractor.dataRecipes
     DataExtractor.savedVariables.dataCollectibles = DataExtractor.dataCollectibles
     DataExtractor.savedVariables.dataHouses = DataExtractor.dataHouses
-    
+
     DataExtractor.savedVariables.dataStyles = DataExtractor.dataStyles
     DataExtractor.savedVariables.dataOutfitStyles = DataExtractor.dataOutfitStyles
     DataExtractor.savedVariables.dataDyes = DataExtractor.dataDyes
     DataExtractor.savedVariables.dataAchievs = DataExtractor.dataAchievs
     DataExtractor.savedVariables.dataAntiquities = DataExtractor.dataAntiquities
     DataExtractor.savedVariables.dataRaids = DataExtractor.dataRaids
+    DataExtractor.savedVariables.dataAllItems = DataExtractor.dataAllItems
 
     ReloadUI("ingame")
 end

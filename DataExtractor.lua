@@ -35,6 +35,7 @@ local DataExtractorDetails = {
         dataStyles = {},
         dataOutfitStyles = {},
         dataDyes = {},
+        dataAllItems = {},
     },
     -- 选项。
     itemScanLimit           = 2000000,           -- 扫描的物品ID数量上限。注意：最大值大约在20万左右。
@@ -55,6 +56,7 @@ local DataExtractorDetails = {
     dataOutfitStyles = {},                      -- 时装幻化外观样式数据。
     dataDyes = {},                              -- 染料数据。
     dataItems = {},                             -- 所有物品数据。
+    dataAllItems = {},                          -- 所有物品的基本信息（id, name, icon, type等）。
 
     -- 计数器。
     dataSkillLinesCounter = 0,
@@ -75,6 +77,7 @@ local DataExtractorDetails = {
     dataStylesCounter = 0,
     dataOutfitStylesCounter = 0,
     dataDyesCounter = 0,
+    dataAllItemsCounter = 0,
     -- 追踪。
     scrapingSkills = false,                     -- 避免同一抓取器同时运行超过一次。
     scrapingItems = false,

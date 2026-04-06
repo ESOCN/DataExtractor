@@ -164,6 +164,17 @@ local function AddItemFromID(i)
     -- Format.
     itemName = zo_strformat(SI_TOOLTIP_ITEM_NAME, itemName)
 
+    -- 存储所有物品的基本信息到 dataAllItems
+    DataExtractor.dataAllItems[i] = {
+        ["id"] = i,
+        ["name"] = itemName,
+        ["icon"] = itemIcon,
+        ["type"] = itemType,
+        ["specialType"] = specializedItemType,
+        ["itemTypeName"] = itemTypeName,
+    }
+    DataExtractor.dataAllItemsCounter = DataExtractor.dataAllItemsCounter + 1
+
     -- 装备
     if hasSet then
         local data = DataExtractor.dataSets
@@ -456,14 +467,6 @@ local function AddItemFromID(i)
         return true
     end
 
-    local data = DataExtractor.dataItems
-    data[i] = {}
-    local item1 = data[i]
-    item1.id = i
-    item1.name = itemName
-    item1.type = itemType
-    item1.specialType = specializedItemType
-
 end
 
 -- 向数据库添加收藏品（仅限可用作家具的收藏品）。
@@ -553,9 +556,9 @@ function DataExtractor.GetAllItems()
                 end
 
                 d(string.format(
-                    '|cFFFFFFDataExtractor:|r 完工! 总IDs: %s 套装: %s 家具: %s 配方: %s 食物: %s. (使用 %s 指令来保存数据!)',
+                    '|cFFFFFFDataExtractor:|r 完工! 总IDs: %s 套装: %s 家具: %s 配方: %s 食物: %s 所有物品: %s. (使用 %s 指令来保存数据!)',
                     limit, DataExtractor.dataSetsCounter, DataExtractor.dataFurnitureCounter,
-                    DataExtractor.dataRecipesCounter, DataExtractor.dataFoodsCounter, DataExtractor.slashSave))
+                    DataExtractor.dataRecipesCounter, DataExtractor.dataFoodsCounter, DataExtractor.dataAllItemsCounter, DataExtractor.slashSave))
                 -- 更新追踪状态。
                 DataExtractor.scrapingItems = false
             end
