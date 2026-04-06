@@ -1,0 +1,29 @@
+CLAUDE.md
+  1bb2af80f8f4a2cc 1-104
+DataExtractor.lua
+  1bb2af80f8f4a2cc 38,59,80
+Settings.lua
+  1bb2af80f8f4a2cc 14,21
+Items.lua
+  1bb2af80f8f4a2cc 167-177,559,561
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "1222096fb8a294330c386668e2ef8eee9d9d13ef",
+  "prompts": {
+    "1bb2af80f8f4a2cc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e30fa36e-76cb-4dd3-93d9-a0d992103702",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "RodMajors <pro-vana@outlook.com>",
+      "messages": [],
+      "total_additions": 475,
+      "total_deletions": 356,
+      "accepted_lines": 475,
+      "overriden_lines": 0
+    }
+  }
+}
