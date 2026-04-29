@@ -1,0 +1,14 @@
+Items.lua
+  h_b0032a12dc880e 174,393-404,414-417,419
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "4e0871a41705cf166ff7866001d6cc61026be011",
+  "prompts": {},
+  "humans": {
+    "h_b0032a12dc880e": {
+      "author": "rodmajors"
+    }
+  }
+}
