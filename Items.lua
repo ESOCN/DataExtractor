@@ -171,7 +171,7 @@ local function AddItemFromID(i)
         ["icon"] = itemIcon,
         ["type"] = itemType,
         ["specialType"] = specializedItemType,
-        ["itemTypeName"] = itemTypeName,
+        ["itemTypeName"] = itemTypeName
     }
     DataExtractor.dataAllItemsCounter = DataExtractor.dataAllItemsCounter + 1
 
@@ -341,7 +341,7 @@ local function AddItemFromID(i)
 
         return true
 
-    -- 家具
+        -- 家具
     elseif itemType == ITEMTYPE_FURNISHING then
         local data = DataExtractor.dataFurniture
 
@@ -388,8 +388,20 @@ local function AddItemFromID(i)
 
         return true
 
-    -- 食物。
+        -- 食物。
     elseif (itemType == ITEMTYPE_DRINK or itemType == ITEMTYPE_FOOD) and IsItemLinkConsumable(link) then
+        -- 获取物品关联的技能信息
+        -- hasAbility: 是否有技能, abilityName: 技能名, abilityDescription: 描述, abilityId: 关键的ID
+        local hasAbility, _, _, abilityId = GetItemLinkOnUseAbilityInfo(link)
+
+        local buffName = ""
+        local buffId = 0
+
+        if hasAbility then
+            buffId = abilityId
+            buffName = GetAbilityName(abilityId) -- 这通常就是你在游戏中看到的 Buff 名字
+        end
+
         local item = {
             ["id"] = i,
             ["name"] = itemName,
@@ -399,13 +411,17 @@ local function AddItemFromID(i)
             ["specializedItemTypeText"] = GetString("SI_SPECIALIZEDITEMTYPE", specializedItemType),
             ["description"] = select(3, GetItemLinkOnUseAbilityInfo(link)),
             ["canBeCrafted"] = Recipes[i] and true or false,
-            ["ingredients"] = ""
+            ["ingredients"] = "",
+            -- 新增 Buff 相关字段
+            ["buffId"] = buffId,
+            ["buffName"] = buffName
         }
+
         DataExtractor.dataFoods[i] = item
         DataExtractor.dataFoodsCounter = DataExtractor.dataFoodsCounter + 1
         return true
 
-    -- 配方。
+        -- 配方。
     elseif itemType == ITEMTYPE_RECIPE then
         local data = DataExtractor.dataRecipes
 
@@ -558,7 +574,8 @@ function DataExtractor.GetAllItems()
                 d(string.format(
                     '|cFFFFFFDataExtractor:|r 完工! 总IDs: %s 套装: %s 家具: %s 配方: %s 食物: %s 所有物品: %s. (使用 %s 指令来保存数据!)',
                     limit, DataExtractor.dataSetsCounter, DataExtractor.dataFurnitureCounter,
-                    DataExtractor.dataRecipesCounter, DataExtractor.dataFoodsCounter, DataExtractor.dataAllItemsCounter, DataExtractor.slashSave))
+                    DataExtractor.dataRecipesCounter, DataExtractor.dataFoodsCounter, DataExtractor.dataAllItemsCounter,
+                    DataExtractor.slashSave))
                 -- 更新追踪状态。
                 DataExtractor.scrapingItems = false
             end
