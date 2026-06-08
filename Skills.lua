@@ -63,8 +63,6 @@ local function GetAllStyleCollectibleIdsForSkill(progressionId)
     return styleIds
 end
 
-
-
 local function UpdateSkillsPosition(i, j, line, k, skillsLimit, linesLimit)
     -- 该技能线的所有技能已完成！也处理空技能线的情况。
     if k == skillsLimit or k == -1 then

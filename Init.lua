@@ -1,5 +1,4 @@
 -- #，表示该变量可能不存在。
-
 --[[ CP技能
 ["dataCpSkills"] = {
   [*integer* lineIndex] = {
@@ -26,9 +25,7 @@
   },
   ...
 }
-]]
-
---[[ 技能
+]] --[[ 技能
 ["dataSkills"] = {
   ["scriptList"] = {
     [*integer* scriptIndex] = {
@@ -107,9 +104,48 @@
   },
   ...
 }
-]]
-
---[[ 药水
+]] --[[ 全部技能（全局遍历）
+["dataAbilities"] = {
+  [*integer* sequentialIndex] = {
+    ["id"] = *integer* abilityId,
+    ["name"] = *string* abilityName,
+    ["icon"] = *string* iconPath,
+    ["description"] = *string* abilityDescription,
+    ["passive"] = *bool*,
+    ["ultimate"] = *bool*,
+    ["isPermanent"] = *bool*,
+    ["isChanneled"] = *bool*,
+    ["castTime"] = *integer* castTimeMS,
+    ["isTank"] = *bool*,
+    ["isHealer"] = *bool*,
+    ["isDamage"] = *bool*,
+    ["minRange"] = *integer* rangeCM,
+    ["maxRange"] = *integer* rangeCM,
+    ["radius"] = *integer* radiusCM,
+    ["distance"] = *integer* halfDistanceCM,
+    ["duration"] = *integer* durationTimeMS,
+    ["target"] = *string* targetName,
+    ["descHeader"] = *string* descriptionHeader,
+    ["cost"] = *integer* resourceCost,
+    #["costPerTick"] = *integer* resourceCostPerTick,
+    #["frequencyMS"] = *integer* frequencyMS,
+    #["powerTypes"] = {
+      #["Magicka"] = *integer* cost,
+      #["Stamina"] = *integer* cost,
+      #["Ultimate"] = *integer* cost,
+      #["Health"] = *integer* cost
+    },
+    #["buffType"] = *integer* buffTypeId,
+    #["upgradeLines"] = {
+      [1] = *string* upgradeText,
+      #[2] = *string* upgradeText,
+      #[3] = *string* upgradeText,
+    },
+    #["newEffect"] = *string* effectText,
+  },
+  ...
+}
+]] --[[ 药水
 ["dataPotions"] = {
   [*integer* itemId] = {
     [*integer* sequentialIndex] = {
@@ -133,9 +169,7 @@
   },
   ...
 }
-]]
-
---[[ 副本
+]] --[[ 副本
 ["dataRaids"] = {
   [*integer* raidIndex] = {
     ["name"] = *string* raidName,
@@ -157,9 +191,7 @@
   },
   ...
 }
-]]
-
---[[ 外观样式
+]] --[[ 外观样式
 ["dataStyles"] = {
   [*integer* sytleIndex] = {
     ["name"] = *string* styleName,
@@ -170,9 +202,7 @@
   },
   ...
 }
-]]
-
---[[ 成就
+]] --[[ 成就
 ["dataAchievs"] = {
   [*integer* categoryIndex] = {
     ["name"] = *string* categoryName,
@@ -223,9 +253,7 @@
   },
   ...
 }
-]]
-
---[[ 住房
+]] --[[ 住房
 ["dataHouses"] = {
   [*integer* houseId] = {
     ["id"]              = *integer* houseId,
@@ -249,9 +277,7 @@
   },
   ...
 }
-]]
-
---[[ 收藏品
+]] --[[ 收藏品
 ["dataCollectibles"] = {
   [*integer* collectibleId] = {
     ["id"]          = *integer* collectibleId,
@@ -266,9 +292,7 @@
   },
   ...
 }
-]]
-
---[[ 物品
+]] --[[ 物品
 ["dataItems"] = {
   ["CollectibleFurniture"] = {
     [*integer* collectibleID] = {
@@ -373,9 +397,7 @@
     ...
   },
 }
-]]
-
---[[ 时装幻化外观样式
+]] --[[ 时装幻化外观样式
 ["dataOutfitStyles"] = {
   [*integer* collectibleId] = {
     ["id"]           = *integer* collectibleId,
@@ -390,9 +412,7 @@
   },
   ...
 }
-]]
-
---[[ 染料
+]] --[[ 染料
 ["dataDyes"] = {
   [*integer* dyeId] = {
     ["id"]              = *integer* dyeId,
@@ -411,7 +431,5 @@
   },
   ...
 }
-]]
-
--- 初始化全局变量，供所有模块访问。
+]] -- 初始化全局变量，供所有模块访问。
 DataExtractor = {}

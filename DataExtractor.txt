@@ -9,6 +9,7 @@
 Init.lua
 
 Skills.lua
+Abilities.lua
 CpSkills.lua
 Achievements.lua
 Items.lua
