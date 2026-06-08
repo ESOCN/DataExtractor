@@ -390,16 +390,23 @@ local function AddItemFromID(i)
 
         -- 食物。
     elseif (itemType == ITEMTYPE_DRINK or itemType == ITEMTYPE_FOOD) and IsItemLinkConsumable(link) then
-        -- 获取物品关联的技能信息
-        -- hasAbility: 是否有技能, abilityName: 技能名, abilityDescription: 描述, abilityId: 关键的ID
-        local hasAbility, _, _, abilityId = GetItemLinkOnUseAbilityInfo(link)
+        local hasAbility, _, abilityDescription, abilityId, hasScaling, minLevel, maxLevel, isChampionPoints = GetItemLinkOnUseAbilityInfo(link)
 
         local buffName = ""
         local buffId = 0
+        local levelRange = nil
 
         if hasAbility then
             buffId = abilityId
-            buffName = GetAbilityName(abilityId) -- 这通常就是你在游戏中看到的 Buff 名字
+            buffName = GetAbilityName(abilityId)
+        end
+
+        if hasScaling then
+            levelRange = {
+                ["min"] = minLevel,
+                ["max"] = maxLevel,
+                ["isChampionPoints"] = isChampionPoints
+            }
         end
 
         local item = {
@@ -409,12 +416,12 @@ local function AddItemFromID(i)
             ["icon"] = itemIcon,
             ["itemTypeText"] = itemTypeName,
             ["specializedItemTypeText"] = GetString("SI_SPECIALIZEDITEMTYPE", specializedItemType),
-            ["description"] = select(3, GetItemLinkOnUseAbilityInfo(link)),
+            ["description"] = abilityDescription,
             ["canBeCrafted"] = Recipes[i] and true or false,
             ["ingredients"] = "",
-            -- 新增 Buff 相关字段
             ["buffId"] = buffId,
-            ["buffName"] = buffName
+            ["buffName"] = buffName,
+            ["level"] = levelRange
         }
 
         DataExtractor.dataFoods[i] = item

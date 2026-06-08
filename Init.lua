@@ -332,6 +332,13 @@
       ["icon"] = *string* iconPath,
       ["canBeCrafted"] = *bool*,
       ["ingredients"] = *string* ingredients,
+      ["buffId"] = *integer* buffAbilityId,
+      ["buffName"] = *string* buffAbilityName,
+      #["level"] = {
+        ["min"] = *integer* minLevel,
+        ["max"] = *integer* maxLevel,
+        ["isChampionPoints"] = *bool*,
+      },
     },
     ...
   },
