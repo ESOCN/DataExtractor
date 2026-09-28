@@ -67,7 +67,7 @@ Skills extraction uses `zo_callLater()` callbacks to process one skill at a time
 ## Common Commands
 
 ### In-Game Slash Commands
-- `/scrapeskills` - Extract all skills (requires Scribing UI opened once to unlock button)
+- `/scrapeskills` - Extract all skills (uses the global crafted-ability API; no need to open the Scribing UI first)
 - `/scrapecpskills` - Extract Champion Points skills
 - `/scrapeitems` - Extract sets, furniture, foods, recipes
 - `/scrapepotions` - Generate all potion/poison combinations
@@ -98,7 +98,7 @@ All output schemas are documented in [Init.lua](Init.lua) with detailed field co
 
 ## Important Constraints
 
-- **Crafted skills requirement**: Must open Scribing UI once per session to populate `SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable` before extraction
+- **Crafted skills**: per-template script lists come from `GetNumScriptsInSlotForCraftedAbility` / `GetScriptIdAtSlotIndexForCraftedAbility`, and combinations are filtered with `IsCraftedAbilityScriptCompatibleWithSelections` (the same API SuperStar uses), so no Scribing UI pre-visit or unlock is required
 - **Async processing**: All extraction functions use callbacks to avoid freezing the game client
 - **Chinese localization**: UI text and some logic (zone mappings) are Chinese-specific
 - **SavedVariables format**: Output is Lua table syntax, not JSON
