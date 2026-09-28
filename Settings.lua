@@ -40,7 +40,7 @@ function DataExtractor.LoadSettings()
         type = "panel",
         name = DataExtractor.menuName .. " 数据提取器",
         displayName = DataExtractor.Colorize(DataExtractor.menuName),
-        author = DataExtractor.Colorize(DataExtractor.author .. ", Chicer, MelanAster", "AAF0BB"),
+        author = DataExtractor.Colorize(DataExtractor.author .. ", Chicor, MelanAster", "AAF0BB"),
         -- version = DataExtractor.Colorize(DataExtractor.version, "AA00FF"),（版本号字段，暂时注释）
         -- slashCommand = "/dataextractor",（斜杠命令字段，暂时注释）
         registerForRefresh = true,
