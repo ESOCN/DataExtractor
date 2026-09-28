@@ -24,12 +24,11 @@ local function SaveData()
     ReloadUI("ingame")
 end
 
+-- 与 SuperStar 同款：篆刻数据走独立全局 API（GetCraftedAbilitySkillCraftedAbilityId /
+-- GetNumScriptsInSlotForCraftedAbility 等），不再依赖需先打开技能面板才填充的
+-- SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable → 按钮始终可用
 local function CraftedSkillCheck()
-    if not SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable[1] then
-        return true
-    else
-        return false
-    end
+    return false
 end
 
 -- 设置菜单。
@@ -40,7 +39,7 @@ function DataExtractor.LoadSettings()
         type = "panel",
         name = DataExtractor.menuName .. " 数据提取器",
         displayName = DataExtractor.Colorize(DataExtractor.menuName),
-        author = DataExtractor.Colorize(DataExtractor.author .. ", Chicor, MelanAster", "AAF0BB"),
+        author = DataExtractor.Colorize(DataExtractor.author .. ", Chicer, MelanAster", "AAF0BB"),
         -- version = DataExtractor.Colorize(DataExtractor.version, "AA00FF"),（版本号字段，暂时注释）
         -- slashCommand = "/dataextractor",（斜杠命令字段，暂时注释）
         registerForRefresh = true,
