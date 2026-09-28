@@ -107,8 +107,8 @@ local function AddCraftedSkill(i, j, k, skill)
         DataExtractor.dataSkills.scriptList = scripts
     end
 
-    local craftAbilityList = SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable
-
+    -- 不再读 SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable（需先开技能面板才填充）；
+    -- 改与 SuperStar 同款：直接用全局 crafted API，打开游戏即可用
     local craftAbilityId = GetCraftedAbilitySkillCraftedAbilityId(i, j, k)
     local craftAbilityName = GetCraftedAbilityDisplayName(craftAbilityId)
     local craftAbilityDescription = GetCraftedAbilityDescription(craftAbilityId)
@@ -118,55 +118,73 @@ local function AddCraftedSkill(i, j, k, skill)
     skill["description"] = craftAbilityDescription
     skill["icon"] = craftAbilityIcon
 
-    local fScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][1]
-    local sScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][2]
-    local tScripts = craftAbilityList[craftAbilityId]["scribingSlotTable"][3]
+    -- 脚本来源改造为 SuperStar 同款 API（实测 SuperStar 无需解锁即可浏览全部篆刻技能）：
+    --   GetNumScriptsInSlotForCraftedAbility / GetScriptIdAtSlotIndexForCraftedAbility
+    --   按「模板 + 槽位」枚举该模板全部可用脚本（不查解锁），组合不再经 IsScribable 预判。
+    local function SlotScripts(craftAbilityId, slotType)
+        local list = {}
+        local n = GetNumScriptsInSlotForCraftedAbility(craftAbilityId, slotType)
+        for i = 1, n do
+            table.insert(list, GetScriptIdAtSlotIndexForCraftedAbility(craftAbilityId, slotType, i))
+        end
+        return list
+    end
+    local fScripts = SlotScripts(craftAbilityId, SCRIBING_SLOT_PRIMARY)
+    local sScripts = SlotScripts(craftAbilityId, SCRIBING_SLOT_SECONDARY)
+    local tScripts = SlotScripts(craftAbilityId, SCRIBING_SLOT_TERTIARY)
 
     for k, primary in pairs(fScripts) do
         for k, secondary in pairs(sScripts) do
             for k, tertiary in pairs(tScripts) do
-                if IsScribableScriptCombinationForCraftedAbility(craftAbilityId, primary, secondary, tertiary) then
+                -- 可装配判定（SuperStar 同款，SuperStar.lua 槽过滤用同一 API，不含解锁）：
+                -- 焦点/标志/附加三个脚本各自与「模板+已选组合」兼容才允许装配 → 导出游戏 UI 真正可选的组合
+                -- （如驭魂 focus=伤害护盾 时标志/附加会被过滤成兼容子集）
+                local ok = IsCraftedAbilityScriptCompatibleWithSelections(primary, craftAbilityId, primary, secondary, tertiary)
+                    and IsCraftedAbilityScriptCompatibleWithSelections(secondary, craftAbilityId, primary, secondary, tertiary)
+                    and IsCraftedAbilityScriptCompatibleWithSelections(tertiary, craftAbilityId, primary, secondary, tertiary)
+                if ok then
                     SetCraftedAbilityScriptSelectionOverride(craftAbilityId, primary, secondary, tertiary)
                     local abilityId = GetCraftedAbilityRepresentativeAbilityId(craftAbilityId)
+                    if abilityId and abilityId > 0 and GetAbilityName(abilityId) ~= nil then
 
-                    local subSkill = {
-                        ["id"] = abilityId,
-                        ["parentAbilityId"] = craftAbilityId,
-                        ["scripts"] = {primary, secondary, tertiary},
-                        ["name"] = GetAbilityName(abilityId),
-                        ["description"] = GetAbilityDescription(abilityId) .. "\r\n\r\n" ..
-                            GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 1) .. "\r\n\r\n" ..
-                            GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 2) .. "\r\n\r\n" ..
-                            GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 3),
-                        ["icon"] = GetAbilityIcon(abilityId),
-                        ["isTank"] = select(1, GetAbilityRoles(abilityId)),
-                        ["isHealer"] = select(2, GetAbilityRoles(abilityId)),
-                        ["isDamage"] = select(3, GetAbilityRoles(abilityId)),
-                        ["ultimate"] = IsAbilityUltimate(abilityId),
-                        ["isChanneled"] = select(1, GetAbilityCastInfo(abilityId)),
-                        ["castTime"] = select(2, GetAbilityCastInfo(abilityId)),
-                        ["passive"] = IsAbilityPassive(abilityId),
-                        ["IsCrafted"] = true,
-                        ["earnedRank"] = 0,
-                        ["cost"] = GetAbilityCost(abilityId),
-                        ["costPerTick"] = {GetAbilityCostPerTick(GetCurrentChainedAbility(abilityId)),
-                                           GetAbilityFrequencyMS(abilityId)},
-                        ["minRange"] = select(1, GetAbilityRange(abilityId)),
-                        ["maxRange"] = select(2, GetAbilityRange(abilityId)),
-                        ["powerTypes"] = GetPowerTypes(abilityId),
-                        ["radius"] = GetAbilityRadius(abilityId),
-                        ["distance"] = GetAbilityAngleDistance(abilityId),
-                        ["duration"] = GetAbilityDuration(abilityId),
-                        ["target"] = GetAbilityTargetDescription(abilityId),
-                        ["descHeader"] = GetAbilityDescriptionHeader(abilityId)
-                    }
+                        local subSkill = {
+                            ["id"] = abilityId,
+                            ["parentAbilityId"] = craftAbilityId,
+                            ["scripts"] = {primary, secondary, tertiary},
+                            ["name"] = GetAbilityName(abilityId),
+                            ["description"] = GetAbilityDescription(abilityId) .. "\r\n\r\n" ..
+                                GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 1) .. "\r\n\r\n" ..
+                                GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 2) .. "\r\n\r\n" ..
+                                GenerateCraftedAbilityScriptSlotDescriptionForAbilityDescription(abilityId, 3),
+                            ["icon"] = GetAbilityIcon(abilityId),
+                            ["isTank"] = select(1, GetAbilityRoles(abilityId)),
+                            ["isHealer"] = select(2, GetAbilityRoles(abilityId)),
+                            ["isDamage"] = select(3, GetAbilityRoles(abilityId)),
+                            ["ultimate"] = IsAbilityUltimate(abilityId),
+                            ["isChanneled"] = select(1, GetAbilityCastInfo(abilityId)),
+                            ["castTime"] = select(2, GetAbilityCastInfo(abilityId)),
+                            ["passive"] = IsAbilityPassive(abilityId),
+                            ["IsCrafted"] = true,
+                            ["earnedRank"] = 0,
+                            ["cost"] = GetAbilityCost(abilityId),
+                            ["costPerTick"] = {GetAbilityCostPerTick(GetCurrentChainedAbility(abilityId)),
+                                               GetAbilityFrequencyMS(abilityId)},
+                            ["minRange"] = select(1, GetAbilityRange(abilityId)),
+                            ["maxRange"] = select(2, GetAbilityRange(abilityId)),
+                            ["powerTypes"] = GetPowerTypes(abilityId),
+                            ["radius"] = GetAbilityRadius(abilityId),
+                            ["distance"] = GetAbilityAngleDistance(abilityId),
+                            ["duration"] = GetAbilityDuration(abilityId),
+                            ["target"] = GetAbilityTargetDescription(abilityId),
+                            ["descHeader"] = GetAbilityDescriptionHeader(abilityId)
+                        }
 
-                    -- 新增：尝试为 Scribing 组合的代表 ability 添加样式 collectibleId 列表
-                    local progressionId = GetProgressionSkillProgressionId(i, j, k) -- 可能为 0 或 nil
-                    subSkill.styleCollectibleIds = GetAllStyleCollectibleIdsForSkill(progressionId)
+                        -- 新增：尝试为 Scribing 组合的代表 ability 添加样式 collectibleId 列表
+                        local progressionId = GetProgressionSkillProgressionId(i, j, k) -- 可能为 0 或 nil
+                        subSkill.styleCollectibleIds = GetAllStyleCollectibleIdsForSkill(progressionId)
 
-                    table.insert(skill, subSkill)
-
+                        table.insert(skill, subSkill)
+                    end
                     ResetCraftedAbilityScriptSelectionOverride()
                 end
             end

@@ -24,12 +24,11 @@ local function SaveData()
     ReloadUI("ingame")
 end
 
+-- 与 SuperStar 同款：篆刻数据走独立全局 API（GetCraftedAbilitySkillCraftedAbilityId /
+-- GetNumScriptsInSlotForCraftedAbility 等），不再依赖需先打开技能面板才填充的
+-- SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable → 按钮始终可用
 local function CraftedSkillCheck()
-    if not SCRIBING_DATA_MANAGER.sortedCraftedAbilityTable[1] then
-        return true
-    else
-        return false
-    end
+    return false
 end
 
 -- 设置菜单。

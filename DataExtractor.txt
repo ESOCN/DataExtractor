@@ -1,7 +1,7 @@
 ## APIVersion: 101047
 ## Title: DataExtractor
 ## Version: 3.01
-## Author: phuein, Chicer, MelanAster
+## Author: phuein, Chicor, MelanAster
 ## Description: Exctract data about items and skills (CN Fork).
 ## SavedVariables: DataExtractorSavedVariables
 ## DependsOn: LibAddonMenu-2.0 LibSets PithkaAchievementTracker
